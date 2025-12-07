@@ -1,0 +1,7 @@
+{
+  "name": "AI Audit Piutang",
+  "description": "Asisten auditor profesional untuk analisis piutang usaha, risiko audit, dan prosedur kepatuhan (ISA/PSAK) menggunakan Gemini AI.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
