@@ -19,7 +19,7 @@ function App() {
     setChatMessages([
       {
         role: 'model',
-        content: "Halo, saya adalah **AI Audit Piutang**. Silakan unggah dokumen piutang (Buku Besar, Aging Schedule, dll) untuk saya analisis, atau tanyakan prosedur audit kepada saya.",
+        content: "Halo, saya adalah **AI Audit Piutang**. Silakan unggah dokumen piutang (**PDF, Gambar, atau CSV**) untuk saya analisis, atau tanyakan prosedur audit kepada saya.",
         timestamp: Date.now()
       }
     ]);
@@ -53,7 +53,7 @@ function App() {
     } catch (error) {
       console.error(error);
       setAnalysisStatus(AnalysisStatus.ERROR);
-      setAnalysisResult("Gagal menganalisis dokumen. Pastikan format file didukung (PDF/Gambar) dan jelas.");
+      setAnalysisResult("Gagal menganalisis dokumen. Pastikan format file didukung (PDF/Gambar/CSV) dan jelas.");
       
       const errorMsg: ChatMessage = {
         role: 'model',
@@ -140,7 +140,7 @@ function App() {
               <FileText className="w-5 h-5 text-indigo-400 mt-1 shrink-0" />
               <div className="overflow-hidden">
                 <p className="text-sm font-medium text-slate-200 truncate">{activeFile.name}</p>
-                <p className="text-xs text-slate-500">{activeFile.type.split('/')[1].toUpperCase()}</p>
+                <p className="text-xs text-slate-500">{activeFile.type.split('/')[1]?.toUpperCase() || 'FILE'}</p>
               </div>
             </div>
           ) : (
@@ -201,7 +201,7 @@ function App() {
                     <FeatureCard 
                       icon={<FileText className="w-6 h-6 text-blue-500" />}
                       title="Analisis Dokumen"
-                      desc="Upload Buku Besar, Aging Schedule, atau Invoice untuk analisis otomatis."
+                      desc="Upload Buku Besar, Aging Schedule, Invoice, atau CSV data."
                     />
                     <FeatureCard 
                       icon={<ShieldCheck className="w-6 h-6 text-green-500" />}

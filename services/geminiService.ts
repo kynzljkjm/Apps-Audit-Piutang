@@ -38,10 +38,19 @@ export const analyzeAuditDocument = async (file: UploadedFile): Promise<string> 
   
   const prompt = `
     Tolong analisis dokumen audit piutang yang saya unggah ini. 
-    Lakukan prosedur berikut:
+    
+    Instruksi Spesifik berdasarkan tipe data:
+    - Jika ini adalah file CSV atau data tabel:
+      1. Anggap baris pertama sebagai header kolom.
+      2. Lakukan pengecekan konsistensi saldo (misal: apakah total detail sesuai dengan grand total).
+      3. Identifikasi tren aneh pada tanggal, nominal, atau nama pelanggan.
+    - Jika ini adalah PDF/Gambar:
+      1. Ekstrak informasi kunci visual.
+      
+    Lakukan prosedur berikut untuk seluruh dokumen:
     1. Identifikasi jenis dokumen (Buku Besar, Aging Schedule, Invoice, dll).
     2. Lakukan analisis vertikal/horizontal atau aging analysis jika data tersedia.
-    3. Identifikasi "red flags" atau risiko fraud/salah saji.
+    3. Identifikasi "red flags" atau risiko fraud/salah saji (misal: saldo minus, piutang macet lama, transaksi bulat tidak wajar).
     4. Berikan rekomendasi prosedur audit substantif maupun test of controls yang relevan.
     
     Sajikan output sesuai format standar yang telah ditetapkan dalam instruksi sistem.

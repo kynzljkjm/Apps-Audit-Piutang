@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Upload, FileText, AlertCircle, FileCheck } from 'lucide-react';
+import { Upload, FileText, AlertCircle, FileCheck, FileSpreadsheet } from 'lucide-react';
 import { UploadedFile } from '../types';
 
 interface FileUploaderProps {
@@ -25,9 +25,23 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, disabled }) =
     setErrorMessage(null);
     
     // Validasi Tipe File
-    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/heic'];
-    if (!validTypes.includes(file.type)) {
-      setErrorMessage("Format tidak didukung. Harap unggah PDF atau Gambar (JPG/PNG).");
+    // Browser kadang mendeteksi CSV sebagai application/vnd.ms-excel atau text/plain
+    const validTypes = [
+      'application/pdf', 
+      'image/jpeg', 
+      'image/png', 
+      'image/webp', 
+      'image/heic',
+      'text/csv',
+      'application/csv',
+      'application/vnd.ms-excel',
+      'text/plain' // Fallback untuk CSV di beberapa OS
+    ];
+
+    const isCsvExtension = file.name.toLowerCase().endsWith('.csv');
+    
+    if (!validTypes.includes(file.type) && !isCsvExtension) {
+      setErrorMessage("Format tidak didukung. Harap unggah PDF, Gambar, atau CSV.");
       return;
     }
 
@@ -49,9 +63,15 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, disabled }) =
         // Hapus prefix data URL
         const base64Data = base64String.split(',')[1];
         
+        // Normalisasi tipe untuk CSV agar konsisten di backend AI
+        let fileType = file.type;
+        if (file.name.toLowerCase().endsWith('.csv')) {
+            fileType = 'text/csv';
+        }
+
         onFileSelect({
           name: file.name,
-          type: file.type,
+          type: fileType,
           data: base64Data,
           size: file.size
         });
@@ -108,7 +128,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, disabled }) =
           ref={fileInputRef} 
           onChange={handleFileChange} 
           className="hidden" 
-          accept="application/pdf,image/jpeg,image/png,image/webp"
+          accept="application/pdf,image/jpeg,image/png,image/webp,text/csv,.csv"
         />
         
         <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
@@ -135,15 +155,15 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, disabled }) =
           </h3>
           <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6 leading-relaxed">
             Klik atau drag file ke area ini. <br/>
-            Mendukung format <span className="font-medium text-slate-700">PDF, JPG, PNG</span>.
+            Mendukung format <span className="font-medium text-slate-700">PDF, JPG, PNG, CSV</span>.
           </p>
 
           {/* Supported Types Badges */}
           <div className="flex flex-wrap justify-center gap-2 mb-2">
              <Badge text="Buku Besar Piutang" />
              <Badge text="Aging Schedule" />
+             <Badge text="File CSV / Excel" icon={<FileSpreadsheet className="w-3 h-3 text-green-600"/>} />
              <Badge text="Invoice / Faktur" />
-             <Badge text="Rekening Koran" />
           </div>
           
           {errorMessage && (
@@ -158,9 +178,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, disabled }) =
   );
 };
 
-const Badge = ({ text }: { text: string }) => (
+const Badge = ({ text, icon }: { text: string, icon?: React.ReactNode }) => (
   <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-[10px] font-semibold rounded-md uppercase tracking-wide border border-slate-200 flex items-center gap-1">
-    <FileCheck className="w-3 h-3 text-slate-400" />
+    {icon || <FileCheck className="w-3 h-3 text-slate-400" />}
     {text}
   </span>
 );
